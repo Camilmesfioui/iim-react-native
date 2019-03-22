@@ -1,8 +1,11 @@
 // React
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, Linking } from 'react-native';
 // Input Gesture
-import { TextInput } from 'react-native-gesture-handler';
+// import { TextInput } from 'react-native-gesture-handler';
+
+// Import Button 
+import { Button } from 'react-native-elements';
 
 // Connect
 import { connect } from 'react-redux';
@@ -17,26 +20,48 @@ function mapStateToProps(state) {
 }
 
 class InfoScreen extends React.Component {
-    state = {
-        clicked: false
+    constructor(props) {
+        super(props);
+        this.state = { 
+            gameId: this.props.navigation.state.params.id
+        }
     }
-    empty = ''
+
+    // Same as in Home.Js
+    async componentDidMount() {
+        return fetch(`https://androidlessonsapi.herokuapp.com/api/game/details?game_id=${this.state.gameId}`, {
+            method: "GET"
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                this.setState({
+                    loading: false,
+                    // Setting state for all needed props
+                    gameName: data.name,
+                    gameType: data.type,
+                    gameYear: data.year,
+                    gamePlayers: data.players,
+                    gameDescriptionEN: data.description_en,
+                    gameUrl: data.url
+                });
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
+
     render() {
-        const { goBack } = this.props.navigation;
         return (
-            <View style={styles.container}>
-                <Text style={styles.h1}>INFO</Text>
-                <Text>Saisir nom</Text>
-                <TextInput 
-                    style={styles.input}
-                    onChangeText={(text) => this.text = text}
-                ></TextInput>
-                <Text
-                    style={styles.text}
-                    onPress={() => this.props.dispatch({ type: 'TEXT', payload: this.text }, this.props.navigation.navigate('Home'))}
-                >Valider</Text>
+            <View style={style.container}>
+                <Text h1>{this.state.gameName}</Text>
+                <View>
+                    <Text>Players : {this.state.gamePlayers}</Text>
+                    <Text>Type : {this.state.gameType}</Text>
+                    <Text>Year : {this.state.gameYear}</Text>
+                    <Text>Description : {this.state.gameDescriptionEN}</Text>
+                    <Button title="Page wikipédia" type="outline" onPress={() => Linking.openURL(`${this.state.gameUrl}`)} />
+                </View>
             </View>
-            //     onPress={() => this.props.navigation.goBack()}
         );
     }
 }

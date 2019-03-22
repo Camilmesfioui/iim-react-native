@@ -1,26 +1,18 @@
 import { StyleSheet } from 'react-native';
 export default styles = StyleSheet.create({
-    container: {
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  item: {
       flex: 1,
-      backgroundColor: '#f7b967',
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-    },
-    h1: {
-      fontSize: 40,
-      margin:40,
-    },
-    h2: {
-      fontSize: 30,
-    },
-    text: {
-      fontSize: 20,
-    },
-    input:{
-      height:30, 
-      width:300,
-      borderColor: '#ddd',
-      borderWidth: 1,
+      alignSelf:'stretch',
       margin: 10,
-    }
-  });
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderBottomWidth: 1,
+      borderBottomColor: '#eee'
+  },
+});

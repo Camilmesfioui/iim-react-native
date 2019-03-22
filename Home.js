@@ -1,5 +1,6 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+// Adding Flatlist to import to render Flat list latter on.
+import { Text, View, FlatList, Button } from 'react-native';
 import { connect } from 'react-redux';
 
 // Style 
@@ -12,20 +13,53 @@ function mapStateToProps(state) {
 }
 
 class HomeScreen extends React.Component {
-    state = {
-        clicked: false,
+    constructor(props) {
+        super(props);
+        this.state = { 
+            // loading state for when collect da returns data.
+            loading: true
+        }
+    }
+
+    //Define your componentDidMount lifecycle hook that will retrieve data.
+    //Also have the async keyword to indicate that it is asynchronous. 
+    async componentDidMount() {
+        // Then fetching game API.
+        return fetch('https://androidlessonsapi.herokuapp.com/api/game/list', {
+            method: "GET"
+        })
+            // Taking the response and sending a JSON reponse back.
+            .then((response) => response.json())
+            .then((data) => {
+                // Updating current state.
+                this.setState({
+                    loading: false,
+                    gameList: data,
+                });
+            })
+            // Catching errors
+            .catch((error) => {
+                console.error(error);
+            });
     }
 
     render() {
         return (
-            <View style={styles.container}>
-                <Text style={styles.h1}>HOME</Text>
-                
-                <Text style={styles.h2} onPress={() =>
-                    this.props.navigation.navigate('Info', {name: "lol"})}
-                    >Saisissez votre nom -></Text>
-                
-                <Text>{this.props.text ? 'Nom: '+ this.props.text : ''}</Text>
+            // Rendering vie
+            <View style={style.container}>
+                {/* Rendering Flat list to display items in UI. */}
+                <FlatList
+                    // Data plain array
+                    data={this.state.gameList}
+                    // Items Rendering
+                    renderItem={
+                        ({item}) => <Text style={style.item} onPress={ () => {
+                            this.props.navigation.navigate('Info', {id: item.id})
+                        }}>{item.name}</Text>
+                    }
+                    // Extracting Unique Key Id.
+                    keyExtractor={({id}) => id}
+                />
             </View>
         );
     }
