@@ -1,6 +1,14 @@
 // React
 import React from 'react';
-import { Text, View, Linking } from 'react-native';
+import { 
+    Text, 
+    View,
+    Image, 
+    Linking,
+    ImageBackground,
+    AsyncStorage, 
+    ScrollView,
+} from 'react-native';
 // Input Gesture
 // import { TextInput } from 'react-native-gesture-handler';
 
@@ -32,8 +40,9 @@ class InfoScreen extends React.Component {
         return fetch(`https://androidlessonsapi.herokuapp.com/api/game/details?game_id=${this.state.gameId}`, {
             method: "GET"
         })
-            .then((response) => response.json())
-            .then((data) => {
+        .then((response) => response.json())
+        .then((data) => {
+            AsyncStorage.setItem('lastGame', data.name);
                 this.setState({
                     loading: false,
                     // Setting state for all needed props
@@ -53,14 +62,22 @@ class InfoScreen extends React.Component {
     render() {
         return (
             <View style={style.container}>
-                <Text h1>{this.state.gameName}</Text>
-                <View>
-                    <Text>Players : {this.state.gamePlayers}</Text>
-                    <Text>Type : {this.state.gameType}</Text>
-                    <Text>Year : {this.state.gameYear}</Text>
-                    <Text>Description : {this.state.gameDescriptionEN}</Text>
-                    <Button title="Page wikipédia" type="outline" onPress={() => Linking.openURL(`${this.state.gameUrl}`)} />
-                </View>
+                <ImageBackground source={require('./assets/bg-2.jpg')} style={{width: '100%', height: '100%'}}>
+                    <Button style={style.btn} title="Retour à la liste" type="solid" onPress={() =>{
+                                this.props.navigation.state.params.onNavigateBack(this.state.gameName),
+                                this.props.navigation.goBack()
+                            }} />
+                    <View style={style.wrapper}>
+                        <ScrollView>
+                            <Text h1 style={style.h1}>{this.state.gameName}</Text>
+                            <Text style={style.space}>Players : {this.state.gamePlayers}</Text>
+                            <Text style={style.space}>Type : {this.state.gameType}</Text>
+                            <Text style={style.space}>Year : {this.state.gameYear}</Text>
+                            <Text style={style.space}>Description : {this.state.gameDescriptionEN}</Text>
+                        </ScrollView>
+                    </View>
+                    <Button style={style.btn} title="Page wikipédia" type="solid" onPress={() => Linking.openURL(`${this.state.gameUrl}`)} />
+                </ImageBackground>
             </View>
         );
     }

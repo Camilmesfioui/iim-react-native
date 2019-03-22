@@ -1,6 +1,13 @@
 import React from 'react';
 // Adding Flatlist to import to render Flat list latter on.
-import { Text, View, FlatList, Button } from 'react-native';
+import { 
+    Text, 
+    View, 
+    FlatList,
+    ImageBackground, 
+    AsyncStorage 
+} from 'react-native';
+import { ListItem, Image } from 'react-native-elements'
 import { connect } from 'react-redux';
 
 // Style 
@@ -8,7 +15,7 @@ import style from './style'
 
 function mapStateToProps(state) {
     return {
-        text: state.text
+        text: state.text,
     }
 }
 
@@ -17,7 +24,8 @@ class HomeScreen extends React.Component {
         super(props);
         this.state = { 
             // loading state for when collect da returns data.
-            loading: true
+            loading: true,
+            lastGame: ""
         }
     }
 
@@ -31,10 +39,13 @@ class HomeScreen extends React.Component {
             // Taking the response and sending a JSON reponse back.
             .then((response) => response.json())
             .then((data) => {
-                // Updating current state.
-                this.setState({
-                    loading: false,
-                    gameList: data,
+                // Init Async storage 
+                AsyncStorage.getItem('lastGame').then(value => {
+                    this.setState({
+                        loading: false,
+                        gameList: data,
+                        lastGameClicked: value,
+                    });
                 });
             })
             // Catching errors
@@ -43,23 +54,37 @@ class HomeScreen extends React.Component {
             });
     }
 
+    handleOnNavigateBack = (lastGame) => {
+        if (lastGame) {
+            this.setState({
+                lastGame
+            })
+        }
+    }
+
     render() {
         return (
-            // Rendering vie
+            // Rendering view
             <View style={style.container}>
-                {/* Rendering Flat list to display items in UI. */}
-                <FlatList
-                    // Data plain array
-                    data={this.state.gameList}
-                    // Items Rendering
-                    renderItem={
-                        ({item}) => <Text style={style.item} onPress={ () => {
-                            this.props.navigation.navigate('Info', {id: item.id})
-                        }}>{item.name}</Text>
-                    }
-                    // Extracting Unique Key Id.
-                    keyExtractor={({id}) => id}
-                />
+                <ImageBackground source={require('./assets/bg-1.jpg')} style={{width: '100%', height: '100%'}}>
+                    <Text style={style.intro}>Welcome in API Game</Text>
+                    <Text style={style.lastGame}>Last Game checked was : {this.state.lastGame}</Text>
+                    {/* Rendering Flat list to display items in UI. */}
+                    <FlatList
+                        // Data plain array
+                        data={this.state.gameList}
+                        // Items Rendering
+                        renderItem={({item}) => <Text style={style.item} onPress={ () => {
+                                this.props.navigation.navigate('Info', {
+                                    id: item.id,
+                                    onNavigateBack: this.handleOnNavigateBack
+                                })
+                            }}>{item.name}</Text>
+                        }
+                        // Extracting Unique Key Id.
+                        keyExtractor={({id}) => id}
+                    />
+                </ImageBackground>
             </View>
         );
     }

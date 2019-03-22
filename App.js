@@ -2,7 +2,10 @@
 import React from 'react';
 
 // Import react-nav + Redux + React Redux
-import {createStackNavigator, createAppContainer} from 'react-navigation';
+import {
+  createStackNavigator, 
+  createAppContainer
+} from 'react-navigation';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 
